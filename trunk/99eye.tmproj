@@ -3,18 +3,18 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>EYETestWindowControllerClass.py</string>
+	<string>EYEApplicationDelegateClass.py</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>EYEApplicationDelegateClass.py</string>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>EYETestWindowControllerClass.py</string>
-			<key>selected</key>
-			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -78,9 +78,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>29</integer>
+				<integer>6</integer>
 				<key>line</key>
-				<integer>24</integer>
+				<integer>36</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -216,6 +216,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{289, 87}, {964, 880}}</string>
+	<string>{{621, -641}, {964, 880}}</string>
 </dict>
 </plist>

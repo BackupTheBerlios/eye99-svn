@@ -15,6 +15,7 @@ class PreferenceController(NibClassBuilder.AutoBaseClass):
 		return self
     def changeTextEditor_(self, sender):
       NSUserDefaults.standardUserDefaults().setObject_forKey_(self.editorPopup.titleOfSelectedItem(), u"ODBTextEditor")
+      NSNotificationCenter.defaultCenter().postNotificationName_object_(u"JMEditorChanged", self)
 
     def awakeFromNib(self):
         #bundle = NSBundle.bundleForClass_( self.class__() )

@@ -114,6 +114,7 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		self._subset=[]
 		self._OrigList=[]
 		self._methodList = []
+		NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(self,"handleEditorChange:",u"JMEditorChanged",None)
 		return self
 	
 	def awakeFromNib(self):
@@ -129,6 +130,9 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		
 		self.createToolbar()
 		# read in the editor from the prefs.
+		self.setEditor()
+
+	def setEditor(self):
 		editor = NSUserDefaults.standardUserDefaults().objectForKey_(u"ODBTextEditor")
 		if not editor: 	self._editorname = "/Applications/TextEdit.app"
 		bundle = NSBundle.mainBundle()
@@ -140,6 +144,9 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 				bundleID = editorItem.objectForKey_(u"ODBEditorBundleID")
 				self._editorname = NSWorkspace.sharedWorkspace().absolutePathForAppBundleWithIdentifier_(bundleID)
 				break
+		# check to see if the editor is run on the CLI
+		if editorItem.objectForKey_(u"ODBEditorLaunchStyle") == 1:
+			self._editorname =editorItem.objectForKey_("ODBEditorPath")
 	  		
 	
 	def windowWillClose_(self, aNotification):
@@ -300,10 +307,7 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 				self._subset+=[obj]
 		self._methodList =self._subset
 		self.methodsTable.reloadData()
-				
-				
-			
-
+	
 # external editor protocol as described here http://www.codingmonkeys.de/techpubs/externaleditor/pbxexternaleditor.html
 	def openInExternalEditor(self, _filePath, _lnnum):
 		from aem.send import Application
@@ -320,10 +324,11 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		self.openInExternalEditor(self._methodList[row][1][:self._methodList[row][1].rfind(":")],\
 											self._methodList[row][1][self._methodList[row][1].rfind(":")+1:])
 		self.methodsTable.reloadData()
-		
-	def reloadVisibleData_(self, sender):
 
-		
+	def handleEditorChange_(self, note):
+		self.setEditor()
+				
+	def reloadVisibleData_(self, sender):
 		self.setStatusTextFieldMessage_("Checking ...")
 		self.getMethods()
 	
