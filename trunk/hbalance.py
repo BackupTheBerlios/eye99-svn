@@ -42,10 +42,11 @@ class GlobDirectoryWalker:
 #retainPattern = re.compile(r'\bretain[\s\]]')
 #kulPattern = re.compile(r'\s*:\s*\[')
 #varPattern = re.compile(r'\b[A-Za-z_]\w*')
+methodHeadPattern = re.compile(r'^[+-]\s*\(')
 ifPattern = re.compile(r'\s*if\s*\(\W*([A-Za-z_]\w*)')
 plusPattern = re.compile(r'\b(((alloc|(mutableC|c)opy)(WithZone)?)|retain)\s*\]')
 allocPattern = re.compile(r'\b(alloc)(WithZone)?\s*\]')
-anchorPattern = re.compile(r'(\b[A-Za-z_]\w*\b)?(\s*\[.*\])?\s*((==|=)|[:]|,)?\s*(\[)[\s\[]*$')
+anchorPattern = re.compile(r'(\b[A-Za-z_]\w*\b)?(\s*\[.*\])?\s*((==|=)|[:]|,|return|\()?\s*(\[)[\s\[]*$')
 #										group1					group2		group3				group5
 implPattern = re.compile(r'@implementation\s*([A-Za-z_]\w*)')
 colAnchorPattern = re.compile(r'(\b[A-Za-z_]\w*)?(\s*):$')
@@ -77,7 +78,7 @@ def finder(inPattern,line,ln):
 			# Since we only check alloc against release we can get away with this
 			# The day we also check the other way around we will need a unified list.
 			pluslista +=[[tmp[0],ln]]
-			linecheck+=[[ tmp[1],ln ]]			
+			linecheck+=[[ tmp[1],ln ]]
 		end = a.start()+len(a.group())# a.end() does not work, why?
 		a = inPattern.search(line[end + offset:])  
 		offset += end
@@ -113,6 +114,11 @@ def assigned(line,i):
 				if partOfAllowed(anchor.group(1)):
 					return (0,-2)
 			return (objectPattern.search(line[i:]).group(1), line[:anc.end()].rfind(",") ) # Yes ugly
+		elif c=="return" or c =="(":
+			a = objectPattern.search(line[i:])	#Some people put parens around their return statements,
+			if a:			 								#this line is just for them
+				return a.group(1), line[:anc.end()].rfind("return")
+			return "return", i
 		else:
 			if not objectPattern.search(line[i:]):
 				return (line,-3)	# errorcode
@@ -204,7 +210,7 @@ def leakFinder(plus, minus, filename, methodname, returnline, ivarList, iflist):
 		if methodname.find(`elemPlus[0]`[1:-1])!=-1 and returnline.find(`elemPlus[0]`[1:-1])!=-1:
 			ok = True
 		for elemIf, lnIf in iflist: # check for if guard e.g if(!elem)
-			if `elemPlus[0]`[1:-1] == elemIf and lnIf<elemPlus[1]:
+			if `elemPlus[0]`[1:-1] == elemIf and not elemPlus[1]<lnIf:
 				ok = True
 		if not ok:
 			Warninglist +=[[ "Warning: " + `elemPlus[0]` + " had a retain increase but no decrease",\
@@ -246,7 +252,7 @@ def parseHeader(fname, implementationName):
 				inblock = True						 # 3 because its nice and small
 		if ininter and inblock: 
 			a = ivarPattern.search(line)
-			if a:
+			if a: # TODO extend so that we can have several declarations on one line
 				ivarList += [a.group(2)]
 	return ivarList
 	
@@ -289,8 +295,9 @@ def maine(filename):
 				if not specialcase:
 					Warninglist+=leakFinder(totalPlusList, totalMinusList, filename, methodname, returnline, ivarList, iflist)
 				inmethod = False
-			if ininter:							
-				if codeline.startswith("- (") or codeline.startswith("-("):
+			if ininter:
+				a = methodHeadPattern.search(codeline)
+				if a:
 					if not specialcase:
 					#When we are ready to start with new method, check old one for faults
 						Warninglist+=leakFinder(totalPlusList, totalMinusList, filename, methodname, returnline, ivarList, iflist)
@@ -314,6 +321,12 @@ def maine(filename):
 					else:
 						specialcase = False
 						inmethod = True
+			a = codeline.find("static")
+			if a!=-1:
+				ivarPattern=re.compile(r'(id|\*)\s*([A-Za-z_]\w*)')
+				b = ivarPattern.search(codeline[a+6:])
+				if b:
+					ivarList += [b.group(2)]
 			
 			if not specialcase and ininter and inmethod:
 				# attempt at comment removal
@@ -328,8 +341,12 @@ def maine(filename):
 				templine +=codeline
 				# Make sure we get complete multi-line msg, ugly and easily fooled
 				# pray that you dont have strings with "]"
-				if templine.count("[") == templine.count("]"): 
+				if templine.count("[") == templine.count("]") and templine.count("/*") == templine.count("*/"):
 					codeline=templine
+					a = codeline.find("/*")
+					b = codeline.find("*/")
+					if a!=-1 and b!=-1: # even uglier and more wrong, but speeds up a lot
+						codeline = codeline[:a]+codeline[b+2:] 
 					templine =""
 					hasalloc, unHookedPlus = finder(plusPattern, codeline,ln)
 					hasdealloc, unHookedMinus=finder(autoreleasePattern, codeline, ln)
@@ -377,7 +394,7 @@ if __name__ == "__main__":
 	#mainProf()
 	#filelist =GlobDirectoryWalker(".", "*.m") #Yes line before makes a huge difference
 	#for filename in filelist:
-	filename = "/Users/joachimmartensson/Projects/adium/Source/AIInterfaceController.m"
+	filename = "/Users/joachimmartensson/Projects/RRSpreadSheet/Source/RRPosition.m"
 		#if filename.find("Controller.m")==-1:
 	maine(filename)
 	#dumpProfileStats()

@@ -1,6 +1,6 @@
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "99eyeballs";
-CFBundleShortVersionString = "99eyeballs version 0.9.1";
-CFBundleGetInfoString = "99eyeballs version 0.9.1, Copyright 2005 Joachim Mårtensson.";
+CFBundleShortVersionString = "99eyeballs version 0.9.2";
+CFBundleGetInfoString = "99eyeballs version 0.9.2, Copyright 2005 Joachim Mårtensson.";
 NSHumanReadableCopyright = "Copyright 2005 Joachim Mårtensson.";
