@@ -1,0 +1,38 @@
+Warning 99eyeballs is just a bunch of regexps. It does not use a proper parser. It is my first python script ever. Don't have too high expectations, high expectations will be let down. Count on it. Make certain that you run the script from your project directory. 99eyeballs will recurse down the directory structure looking for m-files. If you are executing it from the root directory this will take a long time.
+
+Checking the files for the instant messaging client Adium, takes about 30 seconds on my PB 12" 1.33GHz with 768mb ram and 4200
+rpm harddrive.
+
+99eyeballs keeps track of what method it is in, but not other scopes like if/while/for statements. Neither does it keep track of global variables with the exception of ivars declared in the @interface scope. 
+
+99eyeballs will only use the first line of a methodname for analysis so if you like to use the popular style:
+-(void)observerValueForKeyPath:(NSString *)keyPath
+							 ofObject:(id)object
+								change:(NSDictionary *)change
+							  context:(void *)context
+then it will only use -(void)observerValueForKeyPath:(NSString *)keyPath. I am sorry but this is because of my limited knowledge of regexp. The best would ofcourse be to use a proper parser. 							
+
+99eyeballs will look for ivars in the header file with the same name as the implementation, failing that it will use the same name as the m-file but with an ending h. Failing that it will not use any ivars.
+
+99eyeballs only checks if a method with a alloc of a certain variable, contains a (auto)release of the same variable. It does not check the order or anything complicated.
+
+99eyeballs comment removal system is easily fooled. If you like to comment codelines away instead of deleting them, you might get reports based on those lines.
+
+99eyeballs has non-existent support for casts and the C short if form. (see below)
+
+99eyeballs will not report problems with variables starting with capital letter, it's not the "cocoa way" so it should not be much of a problem.
+
+Examples of failures in 99eyeballs when checking Adium code.
+manager = [(AWEzvContactManager *)[AWEzvContactManager alloc] initWithClient:self];
+will pick up AWEzvContactManager instead of manager
+
+theMessage->resultLock = aResultFlag ? [[NSConditionLock alloc] initWithCondition:NO] : nil;
+(format ? [NSString stringWithFormat:format,description] :description)
+(threaded ? threadedContentFilter : contentFilter)[type][direction] = [[NSMutableArray alloc] init];
+99eyeballs has serious problem patternmatching any sort of short form if. A proper parser would come in handy.
+
+Examples of failures in 99eyeballs when checking Cocoalicious code.
+ 
+[*URIString autorelease];
+
+That said it has helped me find a few leaks in a project I have used as a reference. Those leaks are plugged now by the way.

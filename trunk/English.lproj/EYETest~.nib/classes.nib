@@ -1,0 +1,19 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {printDocument = id; reloadVisibleData = id; }; 
+            CLASS = EYETestWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                methodDescriptionTextView = NSTextView; 
+                methodsTable = NSTableView; 
+                progressIndicator = NSProgressIndicator; 
+                statusTextField = NSTextField; 
+                urlTextField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,17 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {newTestAction = id; openDocument = id; }; 
+            CLASS = EYEApplicationDelegate; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {testAction = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
