@@ -313,9 +313,9 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		forces the field's contents to be redisplayed.
 		"""
 		if not aMessage:
-		    aMessage = "Displaying information about " +`len(self._methodList)` +" methods." +`self._working`
+		    aMessage = u"Displaying information about " +`len(self._methodList)` +" methods." +`self._working`
 		self.statusTextField.performSelectorOnMainThread_withObject_waitUntilDone_(
-            "setStringValue:", aMessage, YES)
+            "setStringValue:", unicode(aMessage), 0)
 
 	def reloadData(self):
 		"""Tell the main thread to update the table view."""
@@ -412,11 +412,11 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		filelist =GlobDirectoryWalker(url, "*.m")
 		for filename in filelist:
 			self.receiveMethods(filename)
+			self.setStatusTextFieldMessage_("Found %d methods." % len(self._methodList))
 		self.stopWorking()
 		del pool
 		if self._windowIsClosing:
 			return
-		#self.setStatusTextFieldMessage_("Found %d methods." % len(self._methodList))
 		self.reloadData()
 		self.stopWorking()
 		
