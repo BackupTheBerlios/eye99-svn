@@ -99,7 +99,21 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>151</integer>
+			<integer>176</integer>
+		</dict>
+		<key>English.lproj/InfoPlist.strings</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>49</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>Main.py</key>
 		<dict>
@@ -195,12 +209,13 @@
 		<string>EYEApplicationDelegateClass.py</string>
 		<string>PreferenceController.py</string>
 		<string>EYETestWindowControllerClass.py</string>
+		<string>English.lproj/InfoPlist.strings</string>
 		<string>setup.py</string>
 		<string>hbalance.py</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{135, 122}, {964, 880}}</string>
+	<string>{{289, 87}, {964, 880}}</string>
 </dict>
 </plist>
