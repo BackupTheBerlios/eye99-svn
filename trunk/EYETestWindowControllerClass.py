@@ -14,6 +14,9 @@ from objc import IBOutlet
 from objc import selector
 from objc import YES, NO
 
+from threading import Thread
+from Queue import Queue
+
 import sys
 import types
 import string
@@ -67,6 +70,42 @@ def addToolbarItem(aController, anIdentifier, aLabel, aPaletteLabel,
         toolbarItem.setMenuFormRepresentation_(menuItem)
 
     aController._toolbarItems[anIdentifier] = toolbarItem
+class WorkerThread(Thread):
+	
+	def __init__(self):
+		"""Create a worker thread. Start it by calling the start() method."""
+		self.queue = Queue()
+		Thread.__init__(self)
+	
+	def stop(self):
+		"""Stop the thread a.s.a.p., meaning whenever the currently running
+		job is finished."""
+		self.working = 0
+		self.queue.put(None)
+	
+	def scheduleWork(self, func, *args, **kwargs):
+		"""Schedule some work to be done in the worker thread."""
+		self.queue.put((func, args, kwargs))
+	
+	def run(self):
+		"""Fetch work from a queue, block when there's nothing to do.
+		This method is called by Thread, don't call it yourself."""
+		self.working = 1
+		while self.working:
+			work = self.queue.get()
+			if work is None or not self.working:
+				break
+			func, args, kwargs = work
+			pool = NSAutoreleasePool.alloc().init()
+			try:
+				func(*args, **kwargs)
+			finally:
+			# delete all local references; if they are the last refs they
+			# may invoke autoreleases, which should then end up in our pool
+				del func, args, kwargs, work
+				del pool
+
+
 
 NibClassBuilder.extractClasses( "EYETest" )
 
@@ -77,15 +116,19 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 	NSWindowController.
 	"""
 	__slots__ = ('_toolbarItems',
-	    '_toolbarDefaultItemIdentifiers',
-	    '_toolbarAllowedItemIdentifiers',
-	    '_methods',
-	    '_methodList',
-       '_subset',
-       '_OrigList',
-       '_editorname',		
-	    '_server',
-	    '_methodPrefix',)
+					'_toolbarDefaultItemIdentifiers',
+					'_toolbarAllowedItemIdentifiers',
+					'_methods',
+					'_methodList',
+					'_subset',
+					'_OrigList',
+					'_editorname',		
+					'_server',
+					'_methodPrefix',
+					'_workQueue',
+					'_working',
+					'_workerThread',
+					'_windowIsClosing')
 	
 	def testWindowController(self):
 	    """
@@ -114,7 +157,12 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		self._subset=[]
 		self._OrigList=[]
 		self._methodList = []
-		NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(self,"handleEditorChange:",u"JMEditorChanged",None)
+		self._working = 0
+		self._windowIsClosing = 0
+		self._workerThread = WorkerThread()
+		self._workerThread.start()
+		NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(self,
+			"handleEditorChange:",u"JMEditorChanged",None)
 		return self
 	
 	def awakeFromNib(self):
@@ -153,6 +201,15 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		"""
 		Clean up when the document window is closed.
 		"""
+		# We must stop the worker thread and wait until it actually finishes before
+		# we can allow the window to close. Weird stuff happens if we simply let the
+		# thread run. When this thread is idle (blocking in queue.get()) there is
+		# no problem and we can almost instantly close the window. If it's actually
+		# in the middle of working it may take a couple of seconds, as we can't
+		# _force_ the thread to stop: we have to ask it to to stop itself.
+		self._windowIsClosing = 1  # try to stop the thread a.s.a.p.
+		self._workerThread.stop()  # signal the thread that there is no more work to do
+		self._workerThread.join()  # wait until it finishes
 		self.autorelease()
 	
 	def createToolbar(self):
@@ -256,16 +313,26 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		forces the field's contents to be redisplayed.
 		"""
 		if not aMessage:
-		    aMessage = "Displaying information about %d methods." % len(self._methodList)
-		self.statusTextField.setStringValue_(aMessage)
+		    aMessage = "Displaying information about " +`len(self._methodList)` +" methods." +`self._working`
+		self.statusTextField.performSelectorOnMainThread_withObject_waitUntilDone_(
+            "setStringValue:", aMessage, YES)
+
+	def reloadData(self):
+		"""Tell the main thread to update the table view."""
+		self.methodsTable.performSelectorOnMainThread_withObject_waitUntilDone_( "reloadData", None, 0)
 	
 	def startWorking(self):
 		"""Signal the UI there's work goin on."""
-		self.progressIndicator.startAnimation_(self)
-	
+		if not self._working:
+			self.progressIndicator.startAnimation_(self)
+		self._working += 1
+		
 	def stopWorking(self):
 		"""Signal the UI that the work is done."""
-		self.progressIndicator.stopAnimation_(self)
+		self._working -= 1
+		if not self._working:
+			self.progressIndicator.performSelectorOnMainThread_withObject_waitUntilDone_(
+			"stopAnimation:", self, 0)
 
 # TableView methods, all of this just because I can not get cocoabindings to work.
 	def numberOfRowsInTableView_(self,tableView):
@@ -289,7 +356,7 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 			self.rowSort(2)
 		else:
 			return
-		self.methodsTable.reloadData()
+		self.reloadData()
 	
 	def rowSort(self, n):
 		nlist = [(x[n], x) for x in self._methodList]
@@ -306,7 +373,7 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 			if a !=-1:
 				self._subset+=[obj]
 		self._methodList =self._subset
-		self.methodsTable.reloadData()
+		self.reloadData()
 	
 # external editor protocol as described here http://www.codingmonkeys.de/techpubs/externaleditor/pbxexternaleditor.html
 	def openInExternalEditor(self, _filePath, _lnnum):
@@ -323,29 +390,40 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		row=self.methodsTable.selectedRow()
 		self.openInExternalEditor(self._methodList[row][1][:self._methodList[row][1].rfind(":")],\
 											self._methodList[row][1][self._methodList[row][1].rfind(":")+1:])
-		self.methodsTable.reloadData()
+		self.reloadData()
 
 	def handleEditorChange_(self, note):
 		self.setEditor()
 				
 	def reloadVisibleData_(self, sender):
+		if self._working:
+			# don't start a new job while there's an unfinished one
+			return
 		self.setStatusTextFieldMessage_("Checking ...")
-		self.getMethods()
+		self.startWorking()
+		url = self._server
+		self._workerThread.scheduleWork(self.getMethods, url)
 	
-	def getMethods(self):
+	def getMethods(self, url):
+		pool = NSAutoreleasePool.alloc().init()
 		self._methodList =[]
+		self._OrigList=[]
 		self.startWorking() # Start Process indicator
-		filelist =GlobDirectoryWalker(self._server, "*.m")
+		filelist =GlobDirectoryWalker(url, "*.m")
 		for filename in filelist:
-			self.receiveMethods(filename) 
+			self.receiveMethods(filename)
 		self.stopWorking()
-		self.setStatusTextFieldMessage_("Found %d methods." % len(self._methodList))
-		self.methodsTable.reloadData()
+		del pool
+		if self._windowIsClosing:
+			return
+		#self.setStatusTextFieldMessage_("Found %d methods." % len(self._methodList))
+		self.reloadData()
+		self.stopWorking()
 		
 
 	def receiveMethods(self, filename):
 		a = hbalance.maine(filename)
 		if a : # a can be None
 			self._OrigList += a
-		self._methodList=self._OrigList
-		self.methodsTable.reloadData() 
+			self._methodList+= a
+		self.reloadData() 
