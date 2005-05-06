@@ -86,43 +86,43 @@ def finder(inPattern,line,ln):
 
 	
 def assigned(line,i):
-	""" finds out if a message is attached to a variable, returns a tuple
-	 with variable and position, position will be -1 if attached to varible,
-	 -2 if attached to allowed message, if its attached to a colon
-	the position of the colon will be returned, -3 means error"""
-	anc = anchorPattern.search(line[:i+1]) # i+1 should be "[", or we are SOL
-	if anc:
-		kol = findMatchingCol(line,anc.start())
-		c = anc.group(3)
-		if c =="=":
-			if not anc.group(1):
-				return (line, -3)
-			return (anc.group(1), -1)
-		elif c==":":
-			if partOfAllowed(anc.group(1)):
-				return (0,-2)
-			else:
-				if anc.group(2): # all this uglieness just because I can`t get end() to work
-					return (objectPattern.search(line[i:]).group(1), \
-								anc.start() + len(anc.group(1)) + len(anc.group(2)) + len(anc.group(3)) )
-				return (objectPattern.search(line[i:]).group(1), \
-							anc.start() + len(anc.group(1)) + len(anc.group(3)) ) # yes group(2) should be omitted
-		elif c==",":
-			kol = findMatchingCol(line,line[:anc.end()].rfind(","))
-			anchor = colAnchorPattern.search(line[:kol+1])
-			if anchor:
-				if partOfAllowed(anchor.group(1)):
+		""" finds out if a message is attached to a variable, returns a tuple
+		 with variable and position, position will be -1 if attached to varible,
+		 -2 if attached to allowed message, if its attached to a colon
+		the position of the colon will be returned, -3 means error"""
+		anc = anchorPattern.search(line[:i+1]) # i+1 should be "[", or we are SOL
+		if anc:
+			kol = findMatchingCol(line,anc.start())
+			c = anc.group(3)
+			ob = objectPattern.search(line[i:])
+			if c =="=":
+				if not anc.group(1):
+					return (line, -3)
+				return (anc.group(1), -1)
+			elif c==":":
+				if partOfAllowed(anc.group(1)):
 					return (0,-2)
-			return (objectPattern.search(line[i:]).group(1), line[:anc.end()].rfind(",") ) # Yes ugly
-		elif c=="return" or c =="(":
-			a = objectPattern.search(line[i:])	#Some people put parens around their return statements,
-			if a:			 								#this line is just for them
-				return a.group(1), line[:anc.end()].rfind("return")
-			return "return", i
-		else:
-			if not objectPattern.search(line[i:]):
-				return (line,-3)	# errorcode
-			return objectPattern.search(line[i:]).group(1), -1
+				elif ob:
+					if anc.group(2): # all this uglieness just because I can`t get end() to work
+						return (ob.group(1), anc.start() + len(map( anc.group, (1,2,3) ) ))
+					return (ob.group(1), anc.start() + len(map( anc.group, (1,2,3) ) ) ) # yes group(2) should be omitted
+			elif c==",":
+				kol = findMatchingCol(line,line[:anc.end()].rfind(","))
+				anchor = colAnchorPattern.search(line[:kol+1])
+				if anchor:
+					if partOfAllowed(anchor.group(1)):
+						return (0,-2)
+				if ob:
+					return (ob.group(1), line[:anc.end()].rfind(",") ) # Yes ugly
+			elif c=="return" or c =="(":
+	#Some people put parens around their return statements,
+				if ob:			 								#this line is just for them
+					return ob.group(1), line[:anc.end()].rfind("return")
+				return "return", i
+			elif ob:					
+				return ob.group(1), -1
+			return (line,-3)	# errorcode
+
 
 			
 def partOfAllowed(message, _extra=[]):
@@ -392,11 +392,12 @@ def dumpProfileStats():
 
 if __name__ == "__main__":
 	#mainProf()
-	#filelist =GlobDirectoryWalker(".", "*.m") #Yes line before makes a huge difference
-	#for filename in filelist:
-	filename = "/Users/joachimmartensson/Projects/RRSpreadSheet/Source/RRPosition.m"
-		#if filename.find("Controller.m")==-1:
-	maine(filename)
+	filelist =GlobDirectoryWalker(".", "*.m") #Yes line before makes a huge difference
+	for filename in filelist:
+	#filename = "/Users/joachimm/Projects/Adium/Source/ESUserIconHandlingPlugin.m"
+		if filename.find("Controller.m")==-1:
+			print filename
+			maine(filename)
 	#dumpProfileStats()
 
 	
