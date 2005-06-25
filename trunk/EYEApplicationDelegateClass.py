@@ -34,7 +34,9 @@ class EYEApplicationDelegate(NibClassBuilder.AutoBaseClass):
 		openPanel.runModalForTypes_(None)
 		a =EYETestWindowController.testWindowController()
 		a.showWindow_(sender)
-		a.window().setTitle_(`openPanel.filenames()`[2:-2])
+		aw = a.window()
+		if aw:
+			aw.setTitle_(`openPanel.filenames()`[2:-2])
 		a._server=`openPanel.filenames()`[2:-2]
   	
 	def applicationDidFinishLaunching_(self, aNotification):

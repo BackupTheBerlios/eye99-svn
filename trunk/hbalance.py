@@ -55,8 +55,6 @@ releasePattern = re.compile(r'\brelease(\s)*\]')
 objectPattern = re.compile(r'^[\[\s]*([A-Za-z_]\w*)\b')
 returnPattern = re.compile(r'\breturn\W')
 
-
-
 def finder(inPattern,line,ln):
 	"""returns a tuple with two lists containing the assigned variables list, and the unassigned position list """
 	a = inPattern.search(line)
@@ -255,9 +253,8 @@ def parseHeader(fname, implementationName):
 			if a: # TODO extend so that we can have several declarations on one line
 				ivarList += [a.group(2)]
 	return ivarList
-	
 
-	
+   
 def maine(filename):
 		Warninglist =[]
 		totalPlusList=[]
@@ -276,7 +273,21 @@ def maine(filename):
 		ivarList=[]
 		
 		ln =0
-		for codeline in open(filename):
+		
+		# strip comments
+		phrase = open(filename).read()
+		def insEmp(a):
+		   t = a[0]
+		   b = 0
+		   if t !="" and t[-1] !="\n" and a[1] !="":
+		      b = len(a[0].splitlines())-1
+		   else:
+		      b = len(a[0].splitlines())
+		   return "\n"*b+a[3]
+		comPat = re.compile(r"""((/\*[^*]*\*+([^/*][^*]*\*+)*/[\n]*)|//[^\n]*\n[\n]*)|([\n]+|"(\\.|[^"\\])*"[\n]?|'(\ \.|[^'\\])*'|.[^/"'\\]*)""") # I have zero clues why this work
+		phrase = "".join([insEmp(a) for a in comPat.findall(phrase)])# since we want to keep linenumbering we check insEmp
+		phrase = phrase.splitlines()
+		for codeline in phrase:
 			ln +=1
 			if codeline.startswith("@implementation"):
 				ivarList =[]
@@ -330,23 +341,23 @@ def maine(filename):
 			
 			if not specialcase and ininter and inmethod:
 				# attempt at comment removal
-				a = codeline.find("//")
-				if a !=-1 and codeline[a-1]!=":":# ugly way of removing comment, not "http://"
-					codeline =codeline[:a]
-				a = codeline.find("/*")
-				b = codeline.find("*/")
-				if a!=-1 and b!=-1: # even uglier and more wrong, but speeds up a lot
-					codeline = codeline[:a]+codeline[b+2:]
+				#a = codeline.find("//")
+				#if a !=-1 and codeline[a-1]!=":":# ugly way of removing comment, not "http://"
+				#	codeline =codeline[:a]
+				#a = codeline.find("/*")
+				#b = codeline.find("*/")
+				#if a!=-1 and b!=-1: # even uglier and more wrong, but speeds up a lot
+				#	codeline = codeline[:a]+codeline[b+2:]
 				# Conclusion: in need of a real comment remover
 				templine +=codeline
 				# Make sure we get complete multi-line msg, ugly and easily fooled
 				# pray that you dont have strings with "]"
 				if templine.count("[") == templine.count("]") and templine.count("/*") == templine.count("*/"):
 					codeline=templine
-					a = codeline.find("/*")
-					b = codeline.find("*/")
-					if a!=-1 and b!=-1: # even uglier and more wrong, but speeds up a lot
-						codeline = codeline[:a]+codeline[b+2:] 
+					#a = codeline.find("/*")
+					#b = codeline.find("*/")
+					#if a!=-1 and b!=-1: # even uglier and more wrong, but speeds up a lot
+					#	codeline = codeline[:a]+codeline[b+2:] 
 					templine =""
 					hasalloc, unHookedPlus = finder(plusPattern, codeline,ln)
 					hasdealloc, unHookedMinus=finder(autoreleasePattern, codeline, ln)
@@ -399,6 +410,7 @@ if __name__ == "__main__":
 			print filename
 			maine(filename)
 	#dumpProfileStats()
+	
 
 	
 	

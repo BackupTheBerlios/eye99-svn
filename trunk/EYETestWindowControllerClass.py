@@ -216,7 +216,7 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		"""
 		Creates and configures the toolbar to be used by the window.
 		"""
-		toolbar = NSToolbar.alloc().initWithIdentifier_("EYE Test Window")
+		toolbar = NSToolbar.alloc().initWithIdentifier_(u"EYE Test Window")
 		toolbar.setDelegate_(self)
 		toolbar.setAllowsUserCustomization_(YES)
 		toolbar.setAutosavesConfiguration_(YES)
@@ -381,7 +381,10 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		import struct
 		from Carbon.File import FSSpec
 		SelectionRange=struct.pack('hhllll', 0, int(_lnnum)-1, 1,1,0,0)
-		Application(self._editorname).event('aevt', 'odoc',{'----':FSSpec(_filePath),'kpos':SelectionRange}).send()
+		try:
+			Application(self._editorname).event('aevt', 'odoc',{'----':FSSpec(_filePath),'kpos':SelectionRange}).send()
+		except:
+			pass
 
 	def testAction_(self, sender):
 		self.reloadVisibleData_(sender)
@@ -410,6 +413,8 @@ class EYETestWindowController(NibClassBuilder.AutoBaseClass):
 		self._OrigList=[]
 		self.startWorking() # Start Process indicator
 		filelist =GlobDirectoryWalker(url, "*.m")
+		if not filelist:
+		   self.setStatusTextFieldMessage_("No Objective-C files found")
 		for filename in filelist:
 			self.receiveMethods(filename)
 			self.setStatusTextFieldMessage_("Found %d methods." % len(self._methodList))
