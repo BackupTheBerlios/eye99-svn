@@ -71,7 +71,8 @@ def finder(inPattern,line,ln):
 		elif tmp[1]==-1: # Assigned to varable
 			pluslista +=[[tmp[0],ln]]
 		elif tmp[1]==-3:
-			print "Could not parse: " + tmp[0]
+			#print "Could not parse: " + tmp[0]
+			pass
 		else:
 			# Since we only check alloc against release we can get away with this
 			# The day we also check the other way around we will need a unified list.
@@ -181,10 +182,6 @@ def lineLeakFinder(plus, minus,  filename, methodname,linenum, line):
 		if not ok:
 			Warninglist +=[[ "Warning: Non-autoreleased object assigned to message",\
 									filename + ":"+`linenum`, methodname]]
-			print "in file: " + filename + " :"+`linenum`
-			print "Warning: Non-autoreleased object assigned to message"
-			print "in:" + methodname
-			print "line" + line
 	return Warninglist
 
 
@@ -213,12 +210,6 @@ def leakFinder(plus, minus, filename, methodname, returnline, ivarList, iflist):
 		if not ok:
 			Warninglist +=[[ "Warning: " + `elemPlus[0]` + " had a retain increase but no decrease",\
 								filename+":"+`elemPlus[1]`, methodname]]
-			if not warned:
-				print "in file: " + filename+":"+`elemPlus[1]`
-				print "in method: " + methodname ,
-			print "Warning: " + `elemPlus[0]` + " had a retain increase but no decrease"
-			print ""
-			warned = True
 	return Warninglist
 
 def parseHeader(fname, implementationName):

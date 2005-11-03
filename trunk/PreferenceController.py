@@ -11,8 +11,8 @@ NibClassBuilder.extractClasses("Preferences")
 class PreferenceController(NibClassBuilder.AutoBaseClass):
     # the actual base class is NSWindowController
     def init(self):
-		self = self.initWithWindowNibName_("Preferences")
-		return self
+       self = self.initWithWindowNibName_(u"Preferences")
+       return self
     def changeTextEditor_(self, sender):
       NSUserDefaults.standardUserDefaults().setObject_forKey_(self.editorPopup.titleOfSelectedItem(), u"ODBTextEditor")
       NSNotificationCenter.defaultCenter().postNotificationName_object_(u"JMEditorChanged", self)
@@ -25,7 +25,7 @@ class PreferenceController(NibClassBuilder.AutoBaseClass):
         editorList = editorDict.objectForKey_(u"ODBEditors")
         
         editor = NSUserDefaults.standardUserDefaults().objectForKey_(u"ODBTextEditor") 
-        if not editor: 	editor = "BBEdit"            
+        if not editor: 	editor = u"BBEdit"            
         self.editorPopup.removeAllItems()
         
         for editorItem in editorList:

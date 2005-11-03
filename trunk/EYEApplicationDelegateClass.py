@@ -36,7 +36,7 @@ class EYEApplicationDelegate(NibClassBuilder.AutoBaseClass):
 		a.showWindow_(sender)
 		aw = a.window()
 		if aw:
-			aw.setTitle_(`openPanel.filenames()`[2:-2])
+			aw.setTitle_(unicode(`openPanel.filenames()`[2:-2]))
 		a._server=`openPanel.filenames()`[2:-2]
   	
 	def applicationDidFinishLaunching_(self, aNotification):
@@ -44,4 +44,3 @@ class EYEApplicationDelegate(NibClassBuilder.AutoBaseClass):
 		#self.openDocument_(None)
 		#self.newConnectionAction_(None)
 		#self.newTestAction_(None)
-	

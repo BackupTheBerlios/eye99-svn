@@ -3,18 +3,30 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>EYEApplicationDelegateClass.py</string>
+	<string>EYETestWindowControllerClass.py</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>EYEApplicationDelegateClass.py</string>
+			<key>lastUsed</key>
+			<date>2005-11-02T17:28:23Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>EYETestWindowControllerClass.py</string>
+			<key>lastUsed</key>
+			<date>2005-11-03T19:32:32Z</date>
 			<key>selected</key>
 			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
-			<string>EYETestWindowControllerClass.py</string>
+			<string>WorkerThread.py</string>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>MethodListController.py</string>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -23,6 +35,8 @@
 		<dict>
 			<key>filename</key>
 			<string>Main.py</string>
+			<key>lastUsed</key>
+			<date>2005-11-02T17:28:21Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -31,10 +45,14 @@
 		<dict>
 			<key>filename</key>
 			<string>PreferenceController.py</string>
+			<key>lastUsed</key>
+			<date>2005-11-02T17:22:27Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>README.txt</string>
+			<key>lastUsed</key>
+			<date>2005-11-02T17:22:43Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -59,6 +77,8 @@
 		<dict>
 			<key>filename</key>
 			<string>Problems.txt</string>
+			<key>lastUsed</key>
+			<date>2005-11-02T17:23:07Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -74,28 +94,60 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>58</integer>
 				<key>line</key>
-				<integer>13</integer>
+				<integer>18</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>45</integer>
+				<key>line</key>
+				<integer>18</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>58</integer>
+				<key>line</key>
+				<integer>18</integer>
+			</dict>
 		</dict>
 		<key>EYETestWindowControllerClass.py</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>2</integer>
+				<integer>38</integer>
 				<key>line</key>
-				<integer>148</integer>
+				<integer>286</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>146</integer>
+			<integer>259</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>6</integer>
+				<key>line</key>
+				<integer>286</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>38</integer>
+				<key>line</key>
+				<integer>286</integer>
+			</dict>
 		</dict>
 		<key>English.lproj/InfoPlist.strings</key>
 		<dict>
@@ -149,7 +201,7 @@
 				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
-			<integer>0</integer>
+			<integer>115</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
@@ -158,30 +210,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>31</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>12</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>28</integer>
-				<key>line</key>
-				<integer>7</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>31</integer>
-				<key>line</key>
-				<integer>7</integer>
-			</dict>
 		</dict>
 		<key>hbalance.py</key>
 		<dict>
@@ -227,6 +263,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{302, 49}, {665, 918}}</string>
+	<string>{{403, -16}, {928, 909}}</string>
 </dict>
 </plist>

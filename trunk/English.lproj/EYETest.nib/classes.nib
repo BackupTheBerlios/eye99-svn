@@ -5,15 +5,22 @@
             CLASS = EYETestWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                methodDescriptionTextView = NSTextView; 
+                methods = id; 
                 methodsTable = NSTableView; 
                 progressIndicator = NSProgressIndicator; 
-                statusTextField = NSTextField; 
-                urlTextField = NSTextField; 
+                searchField = NSSearchField; 
+                statusTextField = NSSearchField; 
+                tableContentController = MethodListController; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {performSearch = id; }; 
+            CLASS = MethodListController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSArrayController; 
+        }
     ); 
     IBVersion = 1; 
 }
